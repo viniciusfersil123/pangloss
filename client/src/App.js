@@ -13,6 +13,8 @@ function App() {
     setLoading(true);
     const res = await fetch('http://localhost:5000/words');
     const data = await res.json();
+    // Sort by createdAt descending (most recent first)
+    data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     // After fetching words from backend
     setWords(data.map(w => ({
       ...w,
@@ -157,21 +159,26 @@ function App() {
             border: 'none',
             borderRadius: 6,
             fontWeight: 'bold',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            marginTop: 12,
+            marginBottom: 12
           }}
         >
           Hinzufügen
         </button>
+
         {error && (
-          <div style={{
-            background: '#ffd6d6',
-            color: '#b71c1c',
-            padding: 10,
-            borderRadius: 6,
-            marginBottom: 16,
-            textAlign: 'center',
-            fontWeight: 'bold'
-          }}>
+          <div
+            style={{
+              background: '#ffd6d6',
+              color: '#b71c1c',
+              padding: 10,
+              borderRadius: 6,
+              marginBottom: 16,
+              textAlign: 'center',
+              fontWeight: 'bold'
+            }}
+          >
             {error}
           </div>
         )}
@@ -186,171 +193,178 @@ function App() {
         <p>Lade...</p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
-          {words.map(w => {
-            // console.log('Manuell verknüpfte Wörter für', w.word, ':', w.manualRelatedWords);
-            return (
-              <li
-                key={w._id}
-                style={{
-                  background: '#fff',
-                  marginBottom: 8,
-                  padding: 12,
-                  borderRadius: 6,
-                  border: '1px solid #eee',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4,
-                  position: 'relative'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>
-                    <strong>{w.title || w.word}</strong>
-                    {w.createdAt && (
-                      <span style={{ color: '#888', marginLeft: 12, fontSize: 13 }}>
-                        Hinzugefügt am {new Date(w.createdAt).toLocaleDateString()}
-                      </span>
-                    )}
-                  </span>
-                  <button
-                    onClick={() => handleDelete(w._id)}
-                    style={{
-                      marginLeft: 16,
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#d32f2f',
-                      fontWeight: 'bold',
-                      fontSize: 18,
-                      cursor: 'pointer'
-                    }}
-                    title="Entfernen"
-                  >
-                    ×
-                  </button>
-                </div>
-                {/* "Mehr erfahren" link */}
-                <a
-                  href={`https://www.dwds.de/wb/${encodeURIComponent(w.word)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+          {(() => {
+            const seen = new Set();
+            return words.filter(w => {
+              const key = (w.title || w.word).toLowerCase();
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            }).map(w => {
+              return (
+                <li
+                  key={w._id}
                   style={{
-                    color: '#205c20',
-                    textDecoration: 'underline',
-                    fontWeight: 500,
-                    marginTop: 4,
-                    marginBottom: 4,
-                    cursor: 'pointer',
-                    alignSelf: 'flex-start'
+                    background: '#fff',
+                    marginBottom: 8,
+                    padding: 12,
+                    borderRadius: 6,
+                    border: '1px solid #eee',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                    position: 'relative'
                   }}
                 >
-                  Mehr erfahren
-                </a>
-                {w.definitionList && w.definitionList.filter(def => def.trim() !== '...').length > 0 && (
-                  <div style={{ marginTop: 4 }}>
-                    <strong>Bedeutungen:</strong>
-                    <ol style={{ paddingLeft: 20, listStyleType: 'decimal', listStylePosition: 'inside' }}>
-                      {w.definitionList
-                        .filter(def => def.trim() !== '...')
-                        .map((def, i) => (
-                          <li key={i}>{def}</li>
-                        ))}
-                    </ol>
-                  </div>
-                )}
-                {/* Verwandte Wörter */}
-                {(w.relatedWords?.slice(0, 5).length > 0 || w.manualRelatedWords?.length > 0) && (
-                  <div style={{ marginTop: 4 }}>
-                    <strong>Verwandte Wörter:</strong>
-                    <ul style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 0, margin: 0 }}>
-
-
-                      {/* Manually added related words */}
-                      {w.manualRelatedWords && w.manualRelatedWords.length > 0 && (
-                        <div style={{ marginTop: 4 }}>
-                          <ul style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 0, margin: 0 }}>
-                            {w.manualRelatedWords.map((rel, i) => (
-                              <li key={'manual-' + i} style={{ listStyle: 'none', display: 'flex', alignItems: 'center' }}>
-                                <a
-                                  href={rel.href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={{
-                                    color: '#205c20',
-                                    textDecoration: 'none',
-                                    padding: '2px 6px',
-                                    borderRadius: '4px',
-                                    background: '#fffde7',
-                                    fontWeight: 500,
-                                    border: '1px solid #ffe082',
-                                    transition: 'background 0.2s',
-                                    display: 'inline-block',
-                                    marginRight: 4
-                                  }}
-                                  onMouseOver={e => e.currentTarget.style.background = '#fff9c4'}
-                                  onMouseOut={e => e.currentTarget.style.background = '#fffde7'}
-                                >
-                                  {rel.text}
-                                </a>
-                                <button
-                                  onClick={() => handleRemoveManualRelated(w._id, rel.text)}
-                                  style={{
-                                    background: 'transparent',
-                                    border: 'none',
-                                    color: '#d32f2f',
-                                    fontWeight: 'bold',
-                                    fontSize: 16,
-                                    cursor: 'pointer',
-                                    marginLeft: 2
-                                  }}
-                                  title="Entfernen"
-                                >
-                                  ×
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>
+                      <strong>{w.title || w.word}</strong>
+                      {w.createdAt && (
+                        <span style={{ color: '#888', marginLeft: 12, fontSize: 13 }}>
+                          Hinzugefügt am {new Date(w.createdAt).toLocaleDateString()}
+                        </span>
                       )}
-                    </ul>
+                    </span>
+                    <button
+                      onClick={() => handleDelete(w._id)}
+                      style={{
+                        marginLeft: 16,
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#d32f2f',
+                        fontWeight: 'bold',
+                        fontSize: 18,
+                        cursor: 'pointer'
+                      }}
+                      title="Entfernen"
+                    >
+                      ×
+                    </button>
                   </div>
-                )}
-                <form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    handleAddRelated(w._id);
-                  }}
-                  style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Verknüpftes Wort"
-                    value={relatedInputs[w._id] || ''}
-                    onChange={e => handleRelatedInputChange(w._id, e.target.value)}
-                    style={{ flex: 1, padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
-                  />
-                  <button
-                    type="submit"
+                  {/* "Mehr erfahren" link */}
+                  <a
+                    href={`https://www.dwds.de/wb/${encodeURIComponent(w.word)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
-                      padding: '4px 12px',
-                      borderRadius: 4,
-                      border: 'none',
-                      background: '#205c20',
-                      color: '#fff',
-                      fontWeight: 'bold',
-                      cursor: 'pointer'
+                      color: '#205c20',
+                      textDecoration: 'underline',
+                      fontWeight: 500,
+                      marginTop: 4,
+                      marginBottom: 4,
+                      cursor: 'pointer',
+                      alignSelf: 'flex-start'
                     }}
                   >
-                    Hinzufügen
-                  </button>
-                </form>
-                {relatedErrors[w._id] && (
-                  <div style={{ color: '#d32f2f', fontSize: 13, marginTop: 2 }}>
-                    {relatedErrors[w._id]}
-                  </div>
-                )}
-              </li>
-            );
-          })}
+                    Mehr erfahren
+                  </a>
+                  {w.definitionList && w.definitionList.filter(def => def.trim() !== '...').length > 0 && (
+                    <div style={{ marginTop: 4 }}>
+                      <strong>Bedeutungen:</strong>
+                      <ol style={{ paddingLeft: 20, listStyleType: 'decimal', listStylePosition: 'inside' }}>
+                        {w.definitionList
+                          .filter(def => def.trim() !== '...')
+                          .map((def, i) => (
+                            <li key={i}>{def}</li>
+                          ))}
+                      </ol>
+                    </div>
+                  )}
+                  {/* Verwandte Wörter */}
+                  {(w.relatedWords?.slice(0, 5).length > 0 || w.manualRelatedWords?.length > 0) && (
+                    <div style={{ marginTop: 4 }}>
+                      <strong>Verwandte Wörter:</strong>
+                      <ul style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 0, margin: 0 }}>
+
+
+                        {/* Manually added related words */}
+                        {w.manualRelatedWords && w.manualRelatedWords.length > 0 && (
+                          <div style={{ marginTop: 4 }}>
+                            <ul style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 0, margin: 0 }}>
+                              {w.manualRelatedWords.map((rel, i) => (
+                                <li key={'manual-' + i} style={{ listStyle: 'none', display: 'flex', alignItems: 'center' }}>
+                                  <a
+                                    href={rel.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      color: '#205c20',
+                                      textDecoration: 'none',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      background: '#fffde7',
+                                      fontWeight: 500,
+                                      border: '1px solid #ffe082',
+                                      transition: 'background 0.2s',
+                                      display: 'inline-block',
+                                      marginRight: 4
+                                    }}
+                                    onMouseOver={e => e.currentTarget.style.background = '#fff9c4'}
+                                    onMouseOut={e => e.currentTarget.style.background = '#fffde7'}
+                                  >
+                                    {rel.text}
+                                  </a>
+                                  <button
+                                    onClick={() => handleRemoveManualRelated(w._id, rel.text)}
+                                    style={{
+                                      background: 'transparent',
+                                      border: 'none',
+                                      color: '#d32f2f',
+                                      fontWeight: 'bold',
+                                      fontSize: 16,
+                                      cursor: 'pointer',
+                                      marginLeft: 2
+                                    }}
+                                    title="Entfernen"
+                                  >
+                                    ×
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                  <form
+                    onSubmit={e => {
+                      e.preventDefault();
+                      handleAddRelated(w._id);
+                    }}
+                    style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8, alignItems: 'center' }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Verknüpftes Wort"
+                      value={relatedInputs[w._id] || ''}
+                      onChange={e => handleRelatedInputChange(w._id, e.target.value)}
+                      style={{ flex: 1, padding: 4, borderRadius: 4, border: '1px solid #ccc' }}
+                    />
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: 4,
+                        border: 'none',
+                        background: '#205c20',
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Hinzufügen
+                    </button>
+                  </form>
+                  {relatedErrors[w._id] && (
+                    <div style={{ color: '#d32f2f', fontSize: 13, marginTop: 2 }}>
+                      {relatedErrors[w._id]}
+                    </div>
+                  )}
+                </li>
+              );
+            });
+          })()}
         </ul>
       )}
     </div>
