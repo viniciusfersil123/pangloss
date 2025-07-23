@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 function App() {
   const [words, setWords] = useState([]);
-  const [form, setForm] = useState({ word: '', translation: '', note: '' });
+  const [form, setForm] = useState({ word: '' });
   const [loading, setLoading] = useState(false);
 
-  // Fetch all words from backend
+  // Buscar todas as palavras do backend
   const fetchWords = async () => {
     setLoading(true);
     const res = await fetch('http://localhost:5000/words');
@@ -18,46 +18,56 @@ function App() {
     fetchWords();
   }, []);
 
-  // Handle form input
+  // Lidar com mudanças no formulário
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
+  // Lidar com envio do formulário
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!form.word || !form.translation) return;
+    if (!form.word) return;
     await fetch('http://localhost:5000/words', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
-    setForm({ word: '', translation: '', note: '' });
+    setForm({ word: '' });
     fetchWords();
   };
 
+  // Remover palavra
+  const handleDelete = async id => {
+    await fetch(`http://localhost:5000/words/${id}`, {
+      method: 'DELETE',
+    });
+    fetchWords();
+  };
+
+  // Hilfsfunktion: Gibt true zurück, wenn das Datum in dieser Woche liegt
+  function isThisWeek(date) {
+    const now = new Date();
+    const input = new Date(date);
+    // Set to Monday
+    const firstDayOfWeek = new Date(now);
+    firstDayOfWeek.setDate(now.getDate() - now.getDay() + 1);
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+    // Set to next Monday
+    const nextWeek = new Date(firstDayOfWeek);
+    nextWeek.setDate(firstDayOfWeek.getDate() + 7);
+    return input >= firstDayOfWeek && input < nextWeek;
+  }
+
+  const learnedThisWeek = words.filter(w => w.createdAt && isThisWeek(w.createdAt)).length;
+
   return (
     <div style={{ maxWidth: 500, margin: '40px auto', padding: 24, background: '#f9f9f9', borderRadius: 12 }}>
-      <h1 style={{ textAlign: 'center', marginBottom: 24 }}>Wörterbuch</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: 24 }}>Vinícius Wortschatz</h1>
       <form onSubmit={handleSubmit} style={{ marginBottom: 32 }}>
         <input
           name="word"
           placeholder="Wort"
           value={form.word}
-          onChange={handleChange}
-          style={{ width: '100%', padding: 8, marginBottom: 8, borderRadius: 6, border: '1px solid #ccc' }}
-        />
-        <input
-          name="translation"
-          placeholder="Übersetzung"
-          value={form.translation}
-          onChange={handleChange}
-          style={{ width: '100%', padding: 8, marginBottom: 8, borderRadius: 6, border: '1px solid #ccc' }}
-        />
-        <input
-          name="note"
-          placeholder="Notiz (optional)"
-          value={form.note}
           onChange={handleChange}
           style={{ width: '100%', padding: 8, marginBottom: 8, borderRadius: 6, border: '1px solid #ccc' }}
         />
@@ -77,15 +87,53 @@ function App() {
           Hinzufügen
         </button>
       </form>
-      <h2 style={{ marginBottom: 12 }}>Gespeicherte Wörter</h2>
+      <h2 style={{ marginBottom: 12 }}>
+        Gespeicherte Wörter
+      </h2>
+      <p style={{ marginBottom: 16, color: '#205c20', fontWeight: 'bold' }}>
+        Gelernte Wörter diese Woche: {learnedThisWeek}
+      </p>
       {loading ? (
         <p>Lade...</p>
       ) : (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {words.map(w => (
-            <li key={w._id} style={{ background: '#fff', marginBottom: 8, padding: 12, borderRadius: 6, border: '1px solid #eee' }}>
-              <strong>{w.word}</strong> – {w.translation}
-              {w.note && <span style={{ color: '#888', marginLeft: 8 }}>({w.note})</span>}
+            <li
+              key={w._id}
+              style={{
+                background: '#fff',
+                marginBottom: 8,
+                padding: 12,
+                borderRadius: 6,
+                border: '1px solid #eee',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <span>
+                <strong>{w.word}</strong>
+                {w.createdAt && (
+                  <span style={{ color: '#888', marginLeft: 12, fontSize: 13 }}>
+                    Hinzugefügt am {new Date(w.createdAt).toLocaleDateString()}
+                  </span>
+                )}
+              </span>
+              <button
+                onClick={() => handleDelete(w._id)}
+                style={{
+                  marginLeft: 16,
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#d32f2f',
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                  cursor: 'pointer'
+                }}
+                title="Entfernen"
+              >
+                ×
+              </button>
             </li>
           ))}
         </ul>
