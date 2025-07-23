@@ -1,0 +1,61 @@
+:root {
+  font-family: sans-serif;
+  line-height: normal;
+  font-weight: normal;
+  color: inherit;
+  background-color: transparent;
+  font-synthesis: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+a {
+  font-weight: normal;
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  display: block;
+  place-items: unset;
+  min-width: unset;
+  min-height: unset;
+}
+
+h1 {
+  font-size: inherit;
+  line-height: normal;
+}
+
+button {
+  all: unset;
+  cursor: default;
+}
+
+ol {
+  /* Removes numbers */
+  padding-left: 1rem;
+  /* Optional: keep indentation */
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: inherit;
+    background-color: transparent;
+  }
+
+  a:hover {
+    color: inherit;
+  }
+
+  button {
+    background-color: transparent;
+  }
+}
