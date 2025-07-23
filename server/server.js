@@ -148,9 +148,8 @@ app.post('/words/:id/manual-related', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('🌐 Wortschatz API is running.');
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
-
 // Remove a manual related word
 app.delete('/words/:id/manual-related', async (req, res) => {
   const { text } = req.body;
