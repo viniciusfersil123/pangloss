@@ -1,216 +1,165 @@
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Estilo neutro para o root */
-#root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-  font-family: sans-serif;
-}
-
-/* Body */
-body {
-  background: linear-gradient(120deg, #f8fafc 0%, #e0e7ff 100%);
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  margin: 0;
-  min-height: 100vh;
-}
-
-/* Container da aplicação */
 .container {
-  max-width: 600px;
-  margin: 48px auto;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 6px 32px rgba(60, 72, 88, 0.12);
-  padding: 36px 32px 32px 32px;
+  /* max-width: 700px; */
+  margin: 0 auto;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 22px;
+  box-shadow: 0 8px 36px var(--shadow);
+  padding: 48px 40px 40px 40px;
+  transition: all 0.5s ease;
 }
 
-/* Cabeçalho */
 .header {
+  margin-bottom: 2.5em;
   text-align: center;
-  margin-bottom: 32px;
 }
 
-/* Título principal */
 .title {
-  margin-bottom: 0.25em;
-  font-size: 2.5rem;
+  font-size: 2.7rem;
   font-weight: 700;
-  color: #3730a3;
+  color: var(--accent);
+  margin-bottom: 0.3em;
 }
 
-/* Subtítulo */
 .subtitle {
-  color: #6366f1;
-  font-size: 1.1rem;
-  margin-bottom: 0;
+  font-size: 1.2rem;
+  color: var(--accent);
+  margin-bottom: 1.5em;
 }
 
-/* Campo de input + botão */
 .input-group {
   display: flex;
-  gap: 0.5em;
-  margin-bottom: 2em;
-  justify-content: center;
+  gap: 1.2em;
+  margin-bottom: 2.2em;
 }
 
 .search-input {
   flex: 1;
-  padding: 0.75em 1em;
-  border: 1.5px solid #a5b4fc;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  outline: none;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 0.85em 1.2em;
+  font-size: 1.08rem;
+  background: var(--bg);
   transition: border 0.2s;
 }
 
 .search-input:focus {
-  border-color: #6366f1;
+  border-color: var(--accent);
+  outline: none;
 }
 
 .search-btn {
-  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+  background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 0 1.5em;
-  font-size: 1.1rem;
   font-weight: 600;
+  border-radius: 10px;
+  padding: 0.85em 2em;
+  font-size: 1.08rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.3s, color 0.3s;
 }
 
 .search-btn:hover {
-  background: linear-gradient(90deg, #4f46e5 0%, #6366f1 100%);
+  background: var(--text);
+  color: var(--accent-light);
 }
 
-/* Seções de resultado */
-.section {
-  margin-bottom: 2em;
-}
-
-.section h3 {
-  color: #6366f1;
-  margin-bottom: 0.5em;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-/* Lista de resultados */
-ol, ul {
-  padding-left: 1.5em;
-}
-
-li {
-  margin-bottom: 0.5em;
-  font-size: 1.08rem;
-}
-
-a {
-  color: #3730a3;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-a:hover {
-  color: #6366f1;
-}
-
-/* Status */
-.status {
-  text-align: center;
-  color: #6366f1;
-  font-weight: 500;
-  margin-bottom: 1.5em;
-}
-
-/* Resultados */
 .results {
-  margin-top: 2em;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 2em 1.5em;
-  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.07);
+  display: flex;
+  flex-direction: column;
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px 24px;
+  /* margin-top: 2em; */
+  /* margin-bottom: 2em; */
+  box-shadow: 0 4px 18px var(--shadow);
 }
 
 .word-title {
-  color: #3730a3;
+  color: var(--accent);
   font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 1em;
+  font-weight: 700;
+  /* margin-bottom: 1.5em; */
   text-align: center;
 }
 
-/* Logo e animações desativadas */
-.logo {
-  height: auto;
-  padding: 0;
-  filter: none;
-  transition: none;
-  will-change: auto;
+.section {
+  /* margin-bottom: 2.2em; */
 }
 
-.logo:hover,
-.logo.react:hover {
-  filter: none;
+.section h3 {
+  color: var(--accent);
+  font-size: 1.15rem;
+  margin-bottom: 1em;
 }
 
-@keyframes logo-spin {}
+ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.5em;
+}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: none;
+.status {
+  margin: 2em 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.related-title {
+  margin-bottom: 1.2em;
+  font-size: 1.15rem;
+}
+
+.related-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  /* margin-top: 1.5em; */
+  /* margin-bottom: 1.5em; */
+}
+
+.related-card {
+  background: var(--accent-light);
+  border: 1.5px solid var(--accent);
+  border-radius: 16px;
+  padding: 12px 16px;
+  /* min-height: 80px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(60, 72, 88, 0.10);
+  font-weight: 600;
+  font-size: 1.12rem;
+  color: var(--text);
+  margin: 0;
+  transition: transform 0.15s, box-shadow 0.15s, border 0.2s, background 0.2s, color 0.2s;
+
+  /* paint anchors red */
+  a {
+    /* color: red !important; */
+    text-decoration: none;
   }
 }
 
-.card {
-  padding: 0;
-}
 
-.read-the-docs {
+
+.related-card a {
   color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .tooltip-box {
-  position: fixed; /* changed from absolute */
-  z-index: 1000;
-  min-width: 220px;
-  max-width: 320px;
-  background: #fff;
-  color: #3730a3;
-  border: 1.5px solid #6366f1;
-  border-radius: 10px;
-  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.13);
+  border-color: var(--accent);
+  color: var(--text);
   padding: 1em 1.2em;
-  font-size: 1rem;
-  pointer-events: none;
-  transform: translate(-50%, -110%);
-  transition: opacity 0.15s;
-  opacity: 0.97;
-  white-space: normal;
-  line-height: 1.5;
-}
-
-.tooltip-debug {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  background: #f1f5f9;
-  color: #22223b;
-  border: 1px solid #6366f1;
-  border-radius: 8px;
-  padding: 0.7em 1em;
-  font-size: 0.95em;
-  z-index: 2000;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.13);
-  max-width: 350px;
-  word-break: break-all;
-  opacity: 0.95;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(60, 72, 88, 0.13);
+  font-size: 1.05rem;
+  z-index: 100;
 }

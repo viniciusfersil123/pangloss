@@ -3,6 +3,16 @@ import './App.css';
 
 const TOOLTIP_OFFSET = 18; // px, adjust as needed
 
+
+function getThemeClass(title) {
+  const lower = (title || '').toLowerCase();
+  if (lower.startsWith('der ')) return 'theme-der';
+  if (lower.startsWith('die ')) return 'theme-die';
+  if (lower.startsWith('das ')) return 'theme-das';
+  return 'theme-default';
+}
+
+
 function App() {
   const [input, setInput] = useState('');
   const [data, setData] = useState(null);
@@ -86,25 +96,24 @@ function App() {
   };
 
   return (
-    <div className="container">
+    <div className={`container ${getThemeClass(data?.title)}`}>
       <header className="header">
-        <h1 className="title">DWDS Scraper</h1>
-        <p className="subtitle">Discover German word meanings and relations</p>
+        <h1 className="title">Vinícius Wortschatz</h1>
       </header>
 
       <div className="input-group">
         <input
           type="text"
           className="search-input"
-          placeholder="Enter a word (e.g. Sonne)"
+          placeholder="Gib ein Wort ein (z.B. Sonne)"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
-        <button className="search-btn" onClick={handleSearch}>Search</button>
+        <button className="search-btn" onClick={handleSearch}>Suchen</button>
       </div>
 
-      {loading && <p className="status">Loading...</p>}
+      {loading && <p className="status">Lade...</p>}
 
       {data && (
         <div className="results">
@@ -112,7 +121,7 @@ function App() {
 
           {data.definitionList && data.definitionList.length > 0 && (
             <section className="section">
-              <h3>Meanings</h3>
+              <h3>Bedeutungen</h3>
               <ol>
                 {data.definitionList.map((item, i) => (
                   <li key={i}>{item}</li>
@@ -123,10 +132,10 @@ function App() {
 
           {data.relatedWords && data.relatedWords.length > 0 && (
             <section className="section">
-              <h3>Related Words</h3>
-              <ul>
+              <h3 className="related-title">Verwandte Wörter</h3>
+              <div className="related-grid">
                 {data.relatedWords.map((item, i) => (
-                  <li key={i}>
+                  <div className="related-card" key={i}>
                     <a
                       href={item.href}
                       target="_blank"
@@ -137,9 +146,9 @@ function App() {
                     >
                       {item.text}
                     </a>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           )}
         </div>
@@ -156,8 +165,6 @@ function App() {
           {tooltip.text}
         </div>
       )}
-
-
     </div>
   );
 }
