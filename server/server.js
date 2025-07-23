@@ -14,9 +14,9 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 const WordSchema = new mongoose.Schema({
   word: String,
   title: String,
-  relatedWords: [ { text: String, href: String } ],
-  manualRelatedWords: [ { text: String, href: String } ],
-  definitionList: [ String ],
+  relatedWords: [{ text: String, href: String }],
+  manualRelatedWords: [{ text: String, href: String }],
+  definitionList: [String],
   createdAt: { type: Date, default: Date.now }
 });
 const Word = mongoose.model('Word', WordSchema);
@@ -32,7 +32,7 @@ app.post('/words', async (req, res) => {
 
   try {
     // First, check for duplicates using the input word (case-insensitive)
-    const existsInput = await Word.findOne({ 
+    const existsInput = await Word.findOne({
       $or: [
         { word: { $regex: new RegExp('^' + word.trim() + '$', 'i') } },
         { title: { $regex: new RegExp('^' + word.trim() + '$', 'i') } }
@@ -50,7 +50,7 @@ app.post('/words', async (req, res) => {
     let normalized = title ? title.trim().toLowerCase() : word.trim().toLowerCase();
 
     // Check for duplicates again using normalized value
-    const existsNormalized = await Word.findOne({ 
+    const existsNormalized = await Word.findOne({
       $or: [
         { word: { $regex: new RegExp('^' + normalized + '$', 'i') } },
         { title: { $regex: new RegExp('^' + normalized + '$', 'i') } }
@@ -137,6 +137,10 @@ app.post('/words/:id/manual-related', async (req, res) => {
   ];
   await mainWord.save();
   res.json(mainWord);
+});
+
+app.get('/', (req, res) => {
+  res.send('🌐 Wortschatz API is running.');
 });
 
 // Remove a manual related word
