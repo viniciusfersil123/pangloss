@@ -39,7 +39,7 @@ app.post('/words', async (req, res) => {
       ]
     });
     if (existsInput) {
-      return res.status(409).json({ error: 'Wort bereits gelernt' });
+      return res.status(409).json({ error: 'word already learned' });
     }
 
     // Scrape DWDS
@@ -57,7 +57,7 @@ app.post('/words', async (req, res) => {
       ]
     });
     if (existsNormalized) {
-      return res.status(409).json({ error: 'Wort bereits gelernt' });
+      return res.status(409).json({ error: 'word already learned' });
     }
 
     // Check if scraping returned any useful data
@@ -229,15 +229,6 @@ app.get('/scrape/:word', async (req, res) => {
   }
 });
 
-// Serve static files from React app
-const path = require('path');
-app.use(express.static(path.join(__dirname, '../client/build')));
-
-// For any other route, serve index.html from React
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
-
 // Only one app.listen!
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
