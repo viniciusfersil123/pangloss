@@ -40,12 +40,24 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
-    if (!res.ok) {
-      setError('Wort nicht gefunden ou falsch geschrieben.');
+
+    let data = {};
+    try {
+      data = await res.json();
+    } catch (err) {
+      setError('Unbekannter Fehler.');
       return;
     }
-    const data = await res.json();
-    // Se o backend retornar dados de scraping vazios, mostre o erro
+
+    if (!res.ok) {
+      if (data.error === 'Wort bereits gelernt') {
+        setError('Wort bereits gelernt');
+      } else {
+        setError('Wort nicht gefunden ou falsch geschrieben.');
+      }
+      return;
+    }
+
     if (
       (!data.title || data.title.trim() === '') &&
       (!data.definitionList || data.definitionList.length === 0) &&
@@ -90,6 +102,13 @@ function App() {
     const relatedWord = relatedInputs[id]?.trim();
     if (!relatedWord) return;
 
+    // Find the main word
+    const mainWord = words.find(w => w._id === id);
+    if (mainWord && mainWord.word.toLowerCase() === relatedWord.toLowerCase()) {
+      setRelatedErrors(errors => ({ ...errors, [id]: 'Das Wort kann nicht mit sich selbst verknüpft werden.' }));
+      return;
+    }
+
     // Call backend to add manual related word
     const res = await fetch(`http://localhost:5000/words/${id}/manual-related`, {
       method: 'POST',
@@ -101,7 +120,6 @@ function App() {
       setRelatedErrors(errors => ({ ...errors, [id]: data.error || 'Fehler' }));
       return;
     }
-    // Update the word in state
     setWords(ws => ws.map(w => w._id === id ? data : w));
     setRelatedInputs(inputs => ({ ...inputs, [id]: '' }));
     setRelatedErrors(errors => ({ ...errors, [id]: '' }));
@@ -227,14 +245,16 @@ function App() {
                 >
                   Mehr erfahren
                 </a>
-                {w.definitionList && w.definitionList.length > 0 && (
+                {w.definitionList && w.definitionList.filter(def => def.trim() !== '...').length > 0 && (
                   <div style={{ marginTop: 4 }}>
                     <strong>Bedeutungen:</strong>
-                    <ul>
-                      {w.definitionList.map((def, i) => (
-                        <li key={i}>{def}</li>
-                      ))}
-                    </ul>
+                    <ol style={{ paddingLeft: 20, listStyleType: 'decimal', listStylePosition: 'inside' }}>
+                      {w.definitionList
+                        .filter(def => def.trim() !== '...')
+                        .map((def, i) => (
+                          <li key={i}>{def}</li>
+                        ))}
+                    </ol>
                   </div>
                 )}
                 {/* Verwandte Wörter */}
