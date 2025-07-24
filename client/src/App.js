@@ -11,7 +11,7 @@ function App() {
   // Buscar todas as palavras do backend
   const fetchWords = async () => {
     setLoading(true);
-    const res = await fetch('http://localhost:5000/words');
+    const res = await fetch('/words');
     const data = await res.json();
     // Sort by createdAt descending (most recent first)
     data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
