@@ -230,7 +230,7 @@ app.get('/scrape/:word', async (req, res) => {
     };
 
     // Log the result in the server terminal
-    console.log('Scraped data:', JSON.stringify(result, null, 2));
+    // console.log('Scraped data:', JSON.stringify(result, null, 2));
 
     // Response
     res.json(result);
