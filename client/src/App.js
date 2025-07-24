@@ -37,7 +37,7 @@ function App() {
     e.preventDefault();
     setError('');
     if (!form.word) return;
-    const res = await fetch('http://localhost:5000/words', {
+    const res = await fetch('/words', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
@@ -74,7 +74,7 @@ function App() {
 
   // Remover palavra
   const handleDelete = async id => {
-    await fetch(`http://localhost:5000/words/${id}`, {
+    await fetch(`/words/${id}`, {
       method: 'DELETE',
     });
     fetchWords();
@@ -112,7 +112,7 @@ function App() {
     }
 
     // Call backend to add manual related word
-    const res = await fetch(`http://localhost:5000/words/${id}/manual-related`, {
+    const res = await fetch(`/words/${id}/manual-related`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ relatedWord }),
@@ -128,7 +128,7 @@ function App() {
   };
 
   const handleRemoveManualRelated = async (id, text) => {
-    const res = await fetch(`http://localhost:5000/words/${id}/manual-related`, {
+    const res = await fetch(`/words/${id}/manual-related`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
